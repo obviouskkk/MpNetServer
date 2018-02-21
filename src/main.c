@@ -18,7 +18,7 @@ char* current_dir;
 
 static inline int show_usage()
 {
-	BOOT_LOG(-1, "Usage: %s conf", prog_name);
+	BOOT_LOG("Usage: %s conf", prog_name);
 	exit(-1);
 }
 
@@ -38,18 +38,10 @@ int main(int argc, char* argv[])
 
 	if (config_init(p_conf_file ) == -1) //解析bench.conf,存起来
     {
-        BOOT_LOG(-1, "Failed to Parse File '%s'", argv[1]);
+        BOOT_LOG("Failed to Parse File '%s'", argv[1]);
     }
 
 	daemon_start(argc, argv);
-
-	// init log files
-	log_init_ex( config_get_strval("log_dir"), 
-				config_get_intval("log_level", log_lvl_trace),
-				config_get_intval("log_size", 1<<30), 
-				config_get_intval("max_log_files", 100), 
-				NULL,
-                0) ;	
 
 	renew_now();
 	//解析bind.conf存导bind_config_t
@@ -67,7 +59,7 @@ int main(int argc, char* argv[])
 	net_init(max_fd_num, max_fd_num);
 	if(dll.init_service && dll.init_service(1) != 0)
 	{
-        BOOT_LOG(-1, "FAILED TO INIT PARENT PROCESS");
+        BOOT_LOG("FAILED TO INIT PARENT PROCESS");
 	}
 
 	clean_child_pids();
@@ -82,7 +74,7 @@ int main(int argc, char* argv[])
 		shmq_create(bc_elem);
 
 		if ( (pid = fork ()) < 0 ) {
-			BOOT_LOG(-1, "fork child process error");
+			BOOT_LOG("fork child process error");
 		} else if (pid > 0) { //parent process
 			close_shmq_pipe(bc, i, 0);
 			do_add_conn(bc_elem->sendq.pipe_handles[0], fd_type_pipe, 0, bc_elem);

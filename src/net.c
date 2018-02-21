@@ -138,7 +138,8 @@ epoll_add_again:
 	if (unlikely (epoll_ctl (epfd, EPOLL_CTL_ADD, fd, &ev) != 0)) {
 		if (errno == EINTR)
 			goto epoll_add_again;
-		ERROR_RETURN (("epoll_ctl add %d error: %m", fd), -1);
+		ERROR_LOG ("epoll_ctl add %d error: %m", fd);
+        exit(1);
 	}
 	return 0; 
 }
@@ -303,11 +304,11 @@ static int do_read_conn(int fd, int max)
 		epi.fds[fd].cb.rcvprotlen = 0;
 		epi.fds[fd].cb.recvlen = 0;
 		epi.fds[fd].cb.recvptr = mmap (0, page_size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-		if (epi.fds[fd].cb.recvptr == MAP_FAILED) 
-			//printf ("mmap failed");
-			ERROR_RETURN (("mmap failed"), -1);
+		if (epi.fds[fd].cb.recvptr == MAP_FAILED) {
+			ERROR_LOG ("mmap failed");
+            exit(1);
+        }
 	}
-
 	if (page_size == epi.fds[fd].cb.recvlen) {
 		//printf ("recv buffer is full, fd=%d", fd);
 		TRACE_LOG ("recv buffer is full, fd=%d", fd);
@@ -363,7 +364,8 @@ parse_again:
 		return -1;
 	} else if (unlikely(epi.fds[fd].cb.rcvprotlen == 0)) {
 		if (epi.fds[fd].cb.recvlen == max) {
-			ERROR_RETURN(("unsupported big protocol, recvlen=%d", epi.fds[fd].cb.recvlen), -1);
+			ERROR_LOG("unsupported big protocol, recvlen=%d", epi.fds[fd].cb.recvlen);
+            exit(1);
 		}
 	//实际收到的长度大于等于相应的长度 OK 可执行
 	} else if (epi.fds[fd].cb.recvlen >= epi.fds[fd].cb.rcvprotlen) {
@@ -414,9 +416,8 @@ int net_start(const char* listen_ip, in_port_t listen_port, struct bind_config_i
 		do_add_conn(listenfd, fd_type_listen, 0, bc_elem);
 		ret_code = 0;
 	}
-
-	//printf ("Listen on %s:%u\n", listen_ip ? listen_ip : "ANYADDR", listen_port);
-	BOOT_LOG(ret_code, "Listen on %s:%u", listen_ip ? listen_ip : "ANYADDR", listen_port);
+	BOOT_LOG("Listen on %s:%u", listen_ip ? listen_ip : "ANYADDR", listen_port);
+    return ret_code;
 }
 
 static int schedule_output(struct shm_block *mb)
@@ -511,7 +512,7 @@ int net_loop(int timeout, int max_len, int is_parent)
 
 	nr = epoll_wait(epi.epfd, epi.evs, epi.max_ev_num, timeout);
 	if (unlikely(nr < 0 && errno != EINTR))
-		ERROR_RETURN(("epoll_wait failed, maxfd=%d, epfd=%d: %m", epi.maxfd, epi.epfd), -1);
+		ERROR_LOG("epoll_wait failed, maxfd=%d, epfd=%d: %m", epi.maxfd, epi.epfd);
 	renew_now();
 
 	if (is_parent) {

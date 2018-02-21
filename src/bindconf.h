@@ -1,7 +1,7 @@
 #ifndef __BINDCONF_H__
 #define __BINDCONF_H__
 
-#include <liblog/log.h>
+#include "log.h"
 #include <stdint.h>
 #include "shmq.h"
 #include "config.h"

@@ -1,4 +1,3 @@
-
 #include <assert.h>
 #include <errno.h>
 #include <stdlib.h>
@@ -20,7 +19,6 @@
 static int g_ip_resolved;
 static ip_port_t g_ip_port;
 
-
 int connect_to_svr(const char* ipaddr, in_addr_t port, int bufsz, int timeout)
 {
 	struct sockaddr_in peer;
@@ -38,7 +36,6 @@ int connect_to_svr(const char* ipaddr, in_addr_t port, int bufsz, int timeout)
 		DEBUG_LOG("CONNECTED TO\t[%s:%u fd=%d]", ipaddr, port, fd);
 		do_add_conn(fd, fd_type_remote, &peer, 0);
 	} else {
-		//printf("failed to connect to %s:%u, err=%d %s", ipaddr, port, errno, strerror(errno));
 		ERROR_LOG("failed to connect to %s:%u, err=%d %s", ipaddr, port, errno, strerror(errno));
 	}
 
@@ -46,33 +43,6 @@ int connect_to_svr(const char* ipaddr, in_addr_t port, int bufsz, int timeout)
 }
 
 /*
-int connect_to_service(const char* service_name, uint32_t svr_id, int bufsz, int timeout)
-{
-	printf("TRY CONNECTING TO\t[name=%s id=%u]", service_name, svr_id);
-	addr_node_t* n = get_service_ipport(service_name, svr_id);
-	if (n) {
-		printf("SERVICE RESOLVED\t[name=%s id=%u %u ip=%s port=%d]",
-					service_name, svr_id, n->svr_id, n->ip, n->port);
-		int fd = connect_to_svr(n->ip, n->port, bufsz, timeout);
-		if (fd != -1) {
-			printf("CONNECTED TO\t[%s:%u fd=%d]", n->ip, n->port, fd);
-		}
-
-		// for get_last_connecting_service
-		g_ip_resolved = 1;
-		memcpy(g_ip_port.ip, n->ip, sizeof(g_ip_port.ip));
-		g_ip_port.port = n->port;
-
-		return fd;
-	}
-
-	g_ip_resolved = 0;
-	//ERROR_LOG("no server with the name [%s] and server id [%u] is found", service_name, svr_id);
-	return -1;
-	return 0;
-}
-*/
-
 int asyn_connect_to_svr(const char* ipaddr, in_addr_t port, int bufsz, void (*callback)(int fd, void* arg), void* arg)
 {
 	struct sockaddr_in peer;
@@ -126,27 +96,8 @@ connect_again:
 
 	return 0;
 }
-/*
-int asyn_connect_to_service(const char* service_name, uint32_t svr_id, int bufsz, void (*callback)(int fd, void* arg), void* arg)
-{
-	printf("TRY ASYNCHRONOUSLY CONNECTING TO\t[name=%s id=%u]", service_name, svr_id);
-	addr_node_t* n = get_service_ipport(service_name, svr_id);
-	if (n) {
-		printf("SERVICE RESOLVED\t[name=%s id=%u %u ip=%s port=%d]",
-					service_name, svr_id, n->svr_id, n->ip, n->port);
-		// for get_last_connecting_service
-		g_ip_resolved = 1;
-		memcpy(g_ip_port.ip, n->ip, sizeof(g_ip_port.ip));
-		g_ip_port.port = n->port;
-		// connect to a server asynchronously
-		return asyn_connect_to_svr(n->ip, n->port, bufsz, callback, arg);
-	}
+*/ 
 
-	g_ip_resolved = 0;
-	//ERROR_LOG("no server with the name [%s] and server id [%u] is found", service_name, svr_id);
-	return -1;
-}
-*/
 void close_svr(int svrfd)
 {
 	do_del_conn(svrfd, 2);
@@ -164,26 +115,7 @@ int create_udp_socket(struct sockaddr_in* addr, const char* ip, in_port_t port)
 
 	return socket(PF_INET, SOCK_DGRAM, 0);
 }
-/*
-const char* resolve_service_name(const char* service_name, uint32_t svr_id)
-{  
-	addr_node_t* n = get_service_ipport(service_name, svr_id);
-	if (n) {
-		return n->ip;
-	}
-	return 0;
-}
-*/
-/*
-const ip_port_t* get_last_connecting_service()
-{
-	if (g_ip_resolved) {
-		return &g_ip_port;
-	}
 
-	return 0;
-}
-*/
 int net_send(int fd, const void* data, uint32_t len)
 {
 	int prev_stat = 0;
@@ -201,7 +133,6 @@ int net_send(int fd, const void* data, uint32_t len)
 	if (epi.fds[fd].cb.sendlen == 0) {
 		send_bytes = safe_tcp_send_n(fd, data, len);
 		if (send_bytes == -1) {
-			//printf("failed to write to fd=%d err=%d %s", fd, errno, strerror(errno));
 			ERROR_LOG("failed to write to fd=%d err=%d %s", fd, errno, strerror(errno));
 			do_del_conn(fd, is_parent);
 			return -1;
@@ -213,16 +144,20 @@ int net_send(int fd, const void* data, uint32_t len)
 	if (len > send_bytes){
 		if (!epi.fds[fd].cb.sendptr) {
 			epi.fds[fd].cb.sendptr = (uint8_t*) malloc (len - send_bytes);
-			if (!epi.fds[fd].cb.sendptr)
-				ERROR_RETURN (("malloc error, %s", strerror(errno)), -1);
+			if (!epi.fds[fd].cb.sendptr) {
+				ERROR_LOG("malloc error, %s", strerror(errno) );
+                exit(1);
+            }
 			epi.fds[fd].cb.sndbufsz = len - send_bytes;
 			
 		} else if (epi.fds[fd].cb.sndbufsz < epi.fds[fd].cb.sendlen + len - send_bytes) {
 			epi.fds[fd].cb.sendptr = (uint8_t*)realloc (epi.fds[fd].cb.sendptr,
 					epi.fds[fd].cb.sendlen + len - send_bytes);
-			if (!epi.fds[fd].cb.sendptr)
-				//printf (("realloc error, %s", strerror(errno)), -1);
-				ERROR_RETURN (("realloc error, %s", strerror(errno)), -1);
+			if (!epi.fds[fd].cb.sendptr) {
+				ERROR_LOG("realloc error, %s", strerror(errno));
+                exit(1);
+            }
+            
 			epi.fds[fd].cb.sndbufsz = epi.fds[fd].cb.sendlen + len - send_bytes;
 		}
 			

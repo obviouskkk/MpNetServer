@@ -1,7 +1,7 @@
 #ifndef __DLL_H__
 #define __Dll_H__
 
-#include <liblog/log.h>
+#include "log.h"
 #include <sys/types.h>
 #include "service.h" 
 

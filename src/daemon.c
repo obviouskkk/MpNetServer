@@ -202,10 +202,10 @@ void daemon_stop(void)
 	}
 
 	if (restart && prog_name && saved_argv) {
-		WARN_LOG("%s", "Server restarting...");
+		DEBUG_LOG("%s", "Server restarting...");
 		chdir(current_dir);
 		execv(prog_name, saved_argv);
-		WARN_LOG("%s", "Restart Failed...");
+		DEBUG_LOG("%s", "Restart Failed...");
 	}
 
 	free_argv();

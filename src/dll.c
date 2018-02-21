@@ -49,7 +49,7 @@ int register_plugin(const char* file_name)
 	ret_code = 0;
 
 out:
-    BOOT_LOG(ret_code, "dlopen %s", file_name);
+    BOOT_LOG("dlopen %s", file_name);
     return ret_code;
 }
 

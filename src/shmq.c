@@ -81,25 +81,22 @@ static int align_queue_head (struct shm_queue *q, const struct shm_block *mb)
 	int head_pos = q->addr->head;
 	struct shm_block *pad;
 
-	int surplus = q->length - head_pos;
+	uint32_t surplus = q->length - head_pos;
 
 	if (unlikely (surplus < mb->length))
 	{
 		//queue is full
-		if (unlikely (tail_pos == sizeof (shm_head_t)))
-			//printf("shm_queue is full,head=%d,tail=%d,mb_len=%d",
-			//			head_pos, tail_pos, mb->length);
-			ERROR_RETURN (("shm_queue is full,head=%d,tail=%d,mb_len=%d",
-						head_pos, tail_pos, mb->length), -1);
+		if (unlikely (tail_pos == sizeof (shm_head_t))) {
+			ERROR_LOG("shm_queue is full,head=%d,tail=%d,mb_len=%d",
+						head_pos, tail_pos, mb->length);
+            exit (-1);
+        }
 		//bug
 		else if (unlikely (q->addr->tail > head_pos))
 		{
 			// should be impossible
-			//printf("shm_queue bug, head=%d, tail=%d, mb_len=%d, total_len=%u",
-				//		head_pos, tail_pos, mb->length, q->length);
 			ERROR_LOG("shm_queue bug, head=%d, tail=%d, mb_len=%d, total_len=%u",
 						head_pos, tail_pos, mb->length, q->length);
-
 			q->addr->tail = sizeof (shm_head_t);
 			q->addr->head = sizeof (shm_head_t);
 			//no pad mb
@@ -118,7 +115,6 @@ static int align_queue_head (struct shm_queue *q, const struct shm_block *mb)
 			q->addr->head = sizeof (shm_head_t);
 		}
 	}
-
 	return 0;
 }
 
@@ -140,7 +136,6 @@ int shmq_pop(struct shm_queue* q, struct shm_block** mb)
 	int head_pos = q->addr->head;
 	if (cur_mb->length > page_size)
 		printf("too large packet, len=%d", cur_mb->length);
-	
 	*mb = cur_mb;
 	q->addr->tail += cur_mb->length;
 	TRACE_LOG("pop queue: q=%p length=%d tail=%d head=%d  fd=%d",
@@ -167,7 +162,7 @@ int shmq_push(shm_queue_t* q, shm_block_t* mb, const void* data)
 	for (cnt = 0; cnt != 10; ++cnt) {
 		if ( unlikely((q->addr->tail > q->addr->head)
 						&& (q->addr->tail < q->addr->head + mb->length + page_size)) ) {
-			ALERT_LOG("queue [%p] is full, wait 5 microsecs: [cnt=%d]", q, cnt);
+			DEBUG_LOG("queue [%p] is full, wait 5 microsecs: [cnt=%d]", q, cnt);
 			usleep(5);
 		} else {
 			break;
@@ -201,7 +196,7 @@ int shmq_create(struct bind_config_info* p)
 	p->recvq.length = p->sendq.length;
 
 	err = do_shmq_create(&(p->sendq)) | do_shmq_create(&(p->recvq));
-	BOOT_LOG (err, "Create shared memory queue: %dMB", p->recvq.length / 1024 / 512);
+	BOOT_LOG ("Create shared memory queue: %dMB", p->recvq.length / 1024 / 512);
 	return err;
 }
 

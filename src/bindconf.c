@@ -44,7 +44,7 @@ int load_bind_file(const char* file_name)
 			start = end + 1;
 
             if (bindconf.bind_num > max_listen_fds) {
-                BOOT_LOG(ret_code, "load bind file:%s", file_name);
+                BOOT_LOG("load bind file:%s", file_name);
 			}
 		}
 		munmap(buf, len);
