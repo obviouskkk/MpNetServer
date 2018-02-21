@@ -52,11 +52,9 @@ static inline int handle_fini()
 			return 0;
 		}
 	}
-
 	if ( dll.fini_service && (dll.fini_service(0) != 0) ) {
 		return 0;
 	}
-
 	g_hash_table_destroy(fds.cn);
 	return 1;
 }
@@ -75,7 +73,6 @@ static inline int handle_open(const shm_block_t* mb)
 		fdsess->remote_ip    = *(uint32_t*)&mb->data[2];
 		add_fdsess(fdsess);
 	}
-
 	return 0;
 }
 
@@ -85,11 +82,8 @@ int handle_close(int fd)
 	if (!fdsess) {
 		ERROR_LOG("connection %d had already been closed", fd );
 	}
-
 	//assert(fds.count > 0);
-
 	dll.on_client_conn_closed(fd);
-
 	remove_fdsess(fd);
 	return 0;
 }
@@ -140,9 +134,7 @@ void run_worker_process(bind_config_t* bc, int bc_elem_idx, int n_inited_bc)
 	char prefix[10] = { 0 };
 	int  len       = snprintf(prefix, 8, "%u", bc_elem->server_id);
 	prefix[len] = '_';
-
 	is_parent = 0;
-
 	// 释放从父进程继承的资源
 	close_shmq_pipe(bc, n_inited_bc, 1);
 	shmq_destroy(bc_elem, n_inited_bc);
@@ -155,11 +147,9 @@ void run_worker_process(bind_config_t* bc, int bc_elem_idx, int n_inited_bc)
 		ERROR_LOG("fail to init worker process. server_id=%u server_name=%s", bc_elem->server_id, bc_elem->server_name);
 		goto fail;
 	}
-
     int timeout = config_get_intval("net_loop_interval", 100);
     if (timeout < 0 || timeout > 1000)
         timeout = 100;
-
 	while ( !stop || !handle_fini() ) {
 		net_loop(timeout, page_size, 0);
 	}
@@ -171,7 +161,6 @@ fail:
 	free_argv();
 	free(prog_name);
 	free(current_dir);
-
 	exit(0);
 }
 

@@ -63,7 +63,8 @@ static void write_log(int log_level, const char* fmt, ... )
     char body[MAX_LOG_BUF - 10];
     vsnprintf(body, MAX_LOG_BUF, fmt, ap);
     sprintf(buf, "%s[%s] %s\n", header[log_level], get_daytime_char(), body);
-    printf("%s", buf);
+    //printf("%s", buf);
+    write(1, buf, strlen(buf));
     va_end(ap);
 }
 
