@@ -35,7 +35,8 @@ int main(int argc, char* argv[])
 {
 	parse_args(argc, argv);  //处理参数,显示usage等
 	char *p_conf_file=argv[1];
-
+    
+    log_init(NULL);
 	if (config_init(p_conf_file ) == -1) //解析bench.conf,存起来
     {
         BOOT_LOG("Failed to Parse File '%s'", argv[1]);

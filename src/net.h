@@ -92,16 +92,8 @@ int  do_write_conn(int fd);
 int  do_add_conn(int fd, uint8_t type, struct sockaddr_in *peer, struct bind_config_info* bc_elem);
 void do_del_conn(int fd, int is_conn);
 
-
-
-
-
-
-
 #ifdef __cplusplus
 } // end of extern "C"
 #endif
 
-
-
-#endif
+#endif    // __NET_H__

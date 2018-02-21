@@ -1,3 +1,12 @@
+/* ***********************************************************************
+
+  > File Name: shmq.h
+  > Author: zzy
+  > Mail: 942744575@qq.com 
+  > Created Time: Wed 21 Feb 2018 09:44:30 PM CST
+
+ ********************************************************************** */
+
 #ifndef __SHMQ_H__
 #define __SHMQ_H__
 
@@ -58,24 +67,7 @@ int   shmq_push(shm_queue_t* q, shm_block_t* mb, const void* data);
 int   shmq_pop(struct shm_queue *q, struct shm_block **mb);
 char* shmblk_dump(const struct shm_block *mb);
 
-
-
 extern void close_shmq_pipe(struct bind_config* bc, int idx, int is_child);
 
+#endif  // __SHMQ_H__
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#endif
