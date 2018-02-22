@@ -37,12 +37,6 @@ int main(int argc, char* argv[])
 	parse_args(argc, argv);  //处理参数,显示usage等
 	char *p_conf_file=argv[1];
     ini = iniparser_load(p_conf_file);
-    /*   
-	if (config_init(p_conf_file ) == -1) //解析bench.conf,存起来
-    {
-        BOOT_LOG("Failed to Parse File '%s'", argv[1]);
-    }
-    */
 	daemon_start(argc, argv);
 
 	renew_now();
@@ -56,7 +50,7 @@ int main(int argc, char* argv[])
 		page_size = def_page_size;
 	}
 	//dlopen,dlsym；注册句柄函数
-	register_plugin(iniparser_getstring(ini, "dll_file", NULL));
+	register_plugin(iniparser_getstring(ini, "server:dll_file", NULL));
 
 	net_init(max_fd_num, max_fd_num);
 	if(dll.init_service && dll.init_service(1) != 0)
@@ -88,7 +82,8 @@ int main(int argc, char* argv[])
 			run_worker_process(bc, i, i + 1);
 		}
 	}
-
+    if (backgd_mode == 1)
+        daemon_log(NULL);
     static int stop_count = 0;
 	while (1) {
         if (unlikely(stop == 1 && term_signal == 1 )){

@@ -6,6 +6,7 @@
 #include "bindconf.h"
 
 extern  int max_fd_num ;
+extern int backgd_mode;
 
 volatile extern int stop;
 volatile extern int restart;

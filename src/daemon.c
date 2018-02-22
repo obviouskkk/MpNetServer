@@ -29,7 +29,7 @@ char** saved_argv = NULL;
 static char*	arg_start;
 static char*	arg_end;
 static char*	env_start;
-static int		backgd_mode = 0;
+int backgd_mode = 0;
 static int		status;
 
 static void sigterm_handler(int signo) 
@@ -159,7 +159,6 @@ int daemon_start(int argc, char** argv )
 		daemon (1, 1);
 		backgd_mode = 1;
 		BOOT_LOG (0, "switch to daemon mode");
-        daemon_log(NULL);
 	}
 	return 0;
 
