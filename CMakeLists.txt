@@ -11,8 +11,9 @@ ADD_DEFINITIONS("-Wall -Wno-unused -g    -fhosted -D_REENTRANT -D_GNU_SOURCE  -z
 
 INCLUDE_DIRECTORIES( ${GLIB_INCLUDE_DIR}  )
 INCLUDE_DIRECTORIES(${GLIB_PKG_INCLUDE_DIRS})
-
-SET (EXTRA_LIBS ${EXTRA_LIBS} glib-2.0  dl  pthread )
+INCLUDE_DIRECTORIES(/home/zzy/MpNetServer/iniparser/src)
+LINK_DIRECTORIES(/home/zzy/MpNetServer/iniparser)
+SET (EXTRA_LIBS ${EXTRA_LIBS} glib-2.0  dl  pthread  iniparser)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ../bin)
 AUX_SOURCE_DIRECTORY(./src/ SRC_LIST )
 ADD_EXECUTABLE(server ${SRC_LIST} ) 

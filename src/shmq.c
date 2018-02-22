@@ -192,7 +192,7 @@ int shmq_create(struct bind_config_info* p)
 {
 	int err;
 
-	p->sendq.length = config_get_intval("shmq_length", 1 << 26);
+	p->sendq.length = iniparser_getint(ini, "shmq_length", 1 << 26);
 	p->recvq.length = p->sendq.length;
 
 	err = do_shmq_create(&(p->sendq)) | do_shmq_create(&(p->recvq));

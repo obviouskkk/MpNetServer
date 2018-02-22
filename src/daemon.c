@@ -15,6 +15,7 @@
 
 #include "config.h"
 #include "daemon.h"
+#include "log.h"
 
 atomic_t child_pids[max_listen_fds];
 
@@ -81,7 +82,7 @@ static void rlimit_reset( )
 	  */
 	struct rlimit rlim;
 
-	max_fd_num = config_get_intval("max_open_fd", 20000);
+	max_fd_num = iniparser_getint(ini, "max_open_fd", 20000);
 
 	/* raise open files */
 	rlim.rlim_cur = max_fd_num;
@@ -153,11 +154,12 @@ int daemon_start(int argc, char** argv )
 	arg_end = argv[argc-1] + strlen (argv[argc - 1]) + 1;
 	dup_argv(argc, argv);
 
-	style = config_get_strval ("run_mode");
+	style = iniparser_getstring(ini, "run_mode", NULL);
 	if (!style || !strcasecmp ("background", style)) {
 		daemon (1, 1);
 		backgd_mode = 1;
 		BOOT_LOG (0, "switch to daemon mode");
+        daemon_log(NULL);
 	}
 	return 0;
 

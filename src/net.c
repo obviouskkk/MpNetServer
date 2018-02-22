@@ -18,7 +18,6 @@
 #include "shmq.h"
 #include "dll.h"
 #include "service.h"
-#include "List.h"
 #include "tcp.h"
 #include "config.h"
 #include "net_if.h"

@@ -9,7 +9,7 @@
 
 #include "log.h"
 
-int log_init(const char* log_dir) 
+int daemon_log(const char* log_dir) 
 {
     char* default_dir = "log";
     char* dir = log_dir == NULL ? default_dir: (char*)log_dir;

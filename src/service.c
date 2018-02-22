@@ -36,7 +36,7 @@ static inline void free_fdsess(void* fdsess)
 
 static inline int handle_init(bind_config_info_t* bc_elem)
 {
-	config_cache.idle_timeout = config_get_intval("idle_timeout", 10);
+	config_cache.idle_timeout = iniparser_getint(ini, "idle_timeout", 10);
 	config_cache.bc_elem      = bc_elem;
 
 	fds.cn = g_hash_table_new_full(g_int_hash, g_int_equal, 0, free_fdsess);
@@ -147,7 +147,7 @@ void run_worker_process(bind_config_t* bc, int bc_elem_idx, int n_inited_bc)
 		ERROR_LOG("fail to init worker process. server_id=%u server_name=%s", bc_elem->server_id, bc_elem->server_name);
 		goto fail;
 	}
-    int timeout = config_get_intval("net_loop_interval", 100);
+    int timeout = iniparser_getint(ini, "net_loop_interval", 100);
     if (timeout < 0 || timeout > 1000)
         timeout = 100;
 	while ( !stop || !handle_fini() ) {

@@ -1,21 +1,20 @@
+/* ***********************************************************************
+
+  > File Name: config.h
+  > Author: zzy
+  > Mail: 942744575@qq.com 
+  > Created Time: Thu 22 Feb 2018 11:04:16 AM CST
+
+ ********************************************************************** */
+
 #ifndef __CONFIG_H__
-#define __CONFIG_H__
+#define __CONFIG_H__ 
+#include "iniparser.h"
 
-int   mmap_config_file(const char* file_name, char** buf);
-
-int config_init( const char* filename );
-
-
-int config_get_intval(const char* key, int def);
-
-char*  config_get_strval(const char* key);
-
-int config_update_value(const char* key, const char* val);
-
-int config_append_value(const char* key, const char* val); 
-
+extern dictionary *ini;
+int mmap_config_file(const char* file_name, char** buf);
 int str_split(const char* ifs, char* line, char* field[], int n);
 
-void config_exit();
+#endif  // __CONFIG_H__
 
-#endif
+

@@ -13,6 +13,7 @@
 #include "log.h"
 
 
+
 char* prog_name;
 char* current_dir;
 
@@ -35,27 +36,27 @@ int main(int argc, char* argv[])
 {
 	parse_args(argc, argv);  //处理参数,显示usage等
 	char *p_conf_file=argv[1];
-    
-    log_init(NULL);
+    ini = iniparser_load(p_conf_file);
+    /*   
 	if (config_init(p_conf_file ) == -1) //解析bench.conf,存起来
     {
         BOOT_LOG("Failed to Parse File '%s'", argv[1]);
     }
-
+    */
 	daemon_start(argc, argv);
 
 	renew_now();
 	//解析bind.conf存导bind_config_t
-	load_bind_file(config_get_strval("bind_conf"));
-	socket_timeout = config_get_intval("cli_socket_timeout", 0);
-	page_size      = config_get_intval("incoming_packet_max_size", -1);
-	send_buf_limit_size = config_get_intval("send_buf_limit_size", 0);
+	load_bind_file(iniparser_getstring(ini, "server:bind_conf", NULL));
+	socket_timeout = iniparser_getint(ini, "server:cli_socket_timeout", 0);
+	page_size      = iniparser_getint(ini, "server:incoming_packet_max_size", -1);
+	send_buf_limit_size = iniparser_getint(ini, "server:send_buf_limit_size", 0);
 
 	if (page_size <= 0) {
 		page_size = def_page_size;
 	}
 	//dlopen,dlsym；注册句柄函数
-	register_plugin(config_get_strval("dll_file"));
+	register_plugin(iniparser_getstring(ini, "dll_file", NULL));
 
 	net_init(max_fd_num, max_fd_num);
 	if(dll.init_service && dll.init_service(1) != 0)

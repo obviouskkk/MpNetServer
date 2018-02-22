@@ -68,7 +68,7 @@ static void write_log(int log_level, const char* fmt, ... )
     va_end(ap);
 }
 
-int log_init(const char* log_dir);
+int daemon_log(const char* log_dir);
 
 #define DEBUG_LOG(fmt, args...) do \
 {\
