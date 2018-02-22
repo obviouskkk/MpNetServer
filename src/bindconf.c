@@ -18,7 +18,6 @@ int load_bind_file(const char* file_name)
 {
 	int		ret_code = -1;
 	char*	buf;
-    /*
 	if ( mmap_config_file(file_name, &buf) > 0 ) {
 		char* start = buf;
 		char* end;
@@ -50,7 +49,6 @@ int load_bind_file(const char* file_name)
 		munmap(buf, len);
 		ret_code = 0;
 	}
-    */
 	return ret_code;
 }
 
