@@ -9,7 +9,7 @@
 
 #ifndef __CONFIG_H__
 #define __CONFIG_H__ 
-#include "iniparser.h"
+#include <iniparser.h>
 
 extern dictionary *ini;
 int mmap_config_file(const char* file_name, char** buf);
